@@ -12,6 +12,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (event is SignInRequested) {
         emit(Loading());
         try {
+          
           await authRepository.SignIn(
               Email: event.email, Password: event.password);
           emit(Authenticated());
