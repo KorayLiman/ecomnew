@@ -92,6 +92,16 @@ class DashboardLogin extends StatelessWidget {
               Container(
                 width: 300,
                 child: TextFormField(
+                  onFieldSubmitted: (value) {
+                    _EmailController.clear();
+                    _PasswordController.clear();
+                    if (Email != null &&
+                        Password != null &&
+                        EmailValidator.validate(Email!)) {
+                      BlocProvider.of<AuthBloc>(context).add(
+                          SignInRequested(email: Email!, password: Password!));
+                    }
+                  },
                   onChanged: (value) {
                     Password = value;
                   },

@@ -7,6 +7,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gradient_ui_widgets/gradient_ui_widgets.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({Key? key, required this.firebaseRepository}) : super(key: key);
@@ -31,33 +32,59 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leadingWidth: 200,
-          leading: Container(
-            child: Center(
-              child: const Text(
-                "Kontrol Paneli",
-                style: TextStyle(color: Colors.white),
-              ),
+          centerTitle: true,
+          title: Padding(
+            padding: const EdgeInsets.only(left: 98.0),
+            child: const Text(
+              "E Ticaret",
+              style: TextStyle(color: Colors.black),
             ),
-            decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-              Color.fromRGBO(218, 34, 255, 1),
-              Color.fromRGBO(151, 50, 238, 1)
-            ])),
+          ),
+          leadingWidth: 500,
+          leading: Container(
+            child: Row(
+              children: [
+                Container(
+                  width: 200,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                    Color.fromRGBO(218, 34, 255, 1),
+                    Color.fromRGBO(151, 50, 238, 1)
+                  ])),
+                  child: Center(
+                    child: const Text(
+                      "Kontrol Paneli",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 30,
+                ),
+                Center(
+                  child: Container(
+                      width: 200,
+                      height: 32,
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.search),
+                            filled: true,
+                            fillColor: Colors.grey.shade100,
+                            contentPadding: const EdgeInsets.only(
+                                left: 6, right: 0, top: 0, bottom: 0),
+                            hintStyle: TextStyle(),
+                            hintText: "Ara",
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(10))),
+                      )),
+                ),
+              ],
+            ),
           ),
           backgroundColor: Colors.white,
           elevation: 12,
           actions: [
-            Center(
-              child: Container(
-                  width: 200,
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                        hintText: "Ara",
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10))),
-                  )),
-            ),
             Stack(
               children: [
                 Center(
@@ -78,197 +105,36 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 )
               ],
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 20.0),
+              child: IconButton(
+                  splashRadius: 16,
+                  onPressed: () {},
+                  icon: Icon(Icons.settings, color: Colors.grey.shade700)),
             )
           ],
         ),
         floatingActionButton: PageName == "Ürün Ekle/Çıkar"
-            ? FloatingActionButton(
-                backgroundColor: Colors.orange,
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return StatefulBuilder(
-                          builder: (context, setState) => Dialog(
-                            child: Container(
-                              height: 400,
-                              width: 600,
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(20.0),
-                                        child: Container(
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              IconButton(
-                                                  onPressed: () {},
-                                                  icon: Icon(Icons.add)),
-                                              const Text("Resim ekle")
-                                            ],
-                                          ),
-                                          width: 100,
-                                          height: 100,
-                                          decoration: BoxDecoration(
-                                              color: Colors.grey.shade200,
-                                              borderRadius:
-                                                  BorderRadius.circular(8)),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 80.0),
-                                        child: Container(
-                                          width: 200,
-                                          child: TextFormField(
-                                            controller: _NameController,
-                                            textAlign: TextAlign.center,
-                                            decoration: InputDecoration(
-                                                fillColor: Colors.grey.shade100,
-                                                filled: true,
-                                                border: OutlineInputBorder(),
-                                                hintText: "Ürün adı"),
-                                            autovalidateMode: AutovalidateMode
-                                                .onUserInteraction,
-                                            validator: (value) {
-                                              if (value!.length < 1) {
-                                                return "Ürün ismi 1 karakterden büyük olmalı";
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 220.0),
-                                        child: Container(
-                                          width: 200,
-                                          child: TextFormField(
-                                            controller: _PriceController,
-                                            textAlign: TextAlign.center,
-                                            decoration: InputDecoration(
-                                                fillColor: Colors.grey.shade100,
-                                                filled: true,
-                                                border: OutlineInputBorder(),
-                                                hintText: "Ürün fiyatı"),
-                                            autovalidateMode: AutovalidateMode
-                                                .onUserInteraction,
-                                            onChanged: (value) {
-                                              ProductPrice =
-                                                  double.tryParse(value);
-                                            },
-                                            validator: (value) {
-                                              if (value!.length < 1) {
-                                                return "Ürün ismi 1 karakterden büyük olmalı";
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                      Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              TextButton(
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      IsWeighted = false;
-                                                    });
-                                                  },
-                                                  child: Text(
-                                                    "Adet",
-                                                    style: TextStyle(
-                                                        color:
-                                                            IsWeighted == false
-                                                                ? Colors.blue
-                                                                : Colors.black),
-                                                  )),
-                                              TextButton(
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      IsWeighted = true;
-                                                    });
-                                                  },
-                                                  child: Text(
-                                                    "Kilo",
-                                                    style: TextStyle(
-                                                        color:
-                                                            IsWeighted == true
-                                                                ? Colors.blue
-                                                                : Colors.black),
-                                                  )),
-                                              IsWeighted == true
-                                                  ? Container(
-                                                      width: 50,
-                                                      height: 40,
-                                                      child: TextFormField(
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        maxLines: 1,
-                                                        style: TextStyle(
-                                                            fontSize: 10),
-                                                        decoration: InputDecoration(
-                                                            hintText: "Gram",
-                                                            hintStyle:
-                                                                TextStyle(
-                                                                    fontSize:
-                                                                        10),
-                                                            border: OutlineInputBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12))),
-                                                      ),
-                                                    )
-                                                  : Container()
-                                            ],
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      width: 580,
-                                      child: TextFormField(
-                                        controller: _ExplanationController,
-                                        minLines: 5,
-                                        maxLines: 5,
-                                        onChanged: (value) {
-                                          ProductExplanation = value;
-                                        },
-                                        decoration: InputDecoration(
-                                          fillColor: Colors.grey.shade100,
-                                          filled: true,
-                                          hintText: "Ürün Açıklaması",
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      });
-                },
-                child: Icon(Icons.add),
-              )
-            : null,
+            ? GradientFloatingActionButton.extended(
+                onPressed: () {},
+                label: const Text("Ürün Ekle"),
+                gradient: const LinearGradient(colors: [
+                  Color.fromRGBO(240, 43, 17, 1),
+                  Color.fromRGBO(244, 171, 25, 1)
+                ]))
+            : PageName == "Not Defteri"
+                ? GradientFloatingActionButton.extended(
+                    onPressed: () {},
+                    label: const Text("Not Ekle"),
+                    gradient: const LinearGradient(colors: [
+                      Color.fromRGBO(240, 43, 17, 1),
+                      Color.fromRGBO(244, 171, 25, 1)
+                    ]))
+                : null,
         body: LayoutBuilder(
           builder: (context, constraints) {
             if (constraints.maxHeight > 600 && constraints.maxWidth > 800) {
@@ -447,24 +313,26 @@ class _DashboardState extends State<Dashboard> {
               Expanded(
                 child: SingleChildScrollView(
                   physics: ScrollPhysics(),
-                  child: GridView.count(
-                      padding: const EdgeInsets.all(30),
-                      childAspectRatio: 0.8,
-                      crossAxisSpacing: 30,
-                      mainAxisSpacing: 30,
+                  child: GridView.builder(
                       shrinkWrap: true,
-                      crossAxisCount: 4,
-                      children: [
-                        Material(
-                          borderRadius: BorderRadius.circular(20),
-                          elevation: 20,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Colors.blue.shade300),
-                          ),
-                        )
-                      ]),
+                      itemCount: 8,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                      ),
+                      itemBuilder: (context, index) {
+                        return Container(
+                            height: 180,
+                            width: 60,
+                            color: index == 0
+                                ? Colors.blue.shade400
+                                : index == 1
+                                    ? Colors.orange.shade400
+                                    : index == 2
+                                        ? Colors.green.shade400
+                                        : index == 3
+                                            ? Colors.pink.shade400
+                                            : Colors.blue);
+                      }),
                 ),
               )
             ],
@@ -956,7 +824,14 @@ class _DashboardState extends State<Dashboard> {
                   width: double.infinity,
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
-                    child: BarChartSample1(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Expanded(child: BarChartSample1()),
+                        Expanded(child: PieChartSample2()),
+                      ],
+                    ),
                   ),
                 ),
               ),

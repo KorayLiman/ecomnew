@@ -42,16 +42,15 @@ class PieChart2State extends State {
                         });
                       }),
                       borderData: FlBorderData(
-                        show: false,
-                      ),
-                      sectionsSpace: 0,
-                      centerSpaceRadius: 40,
+                          show: false,),
+                      sectionsSpace: 20,
+                      centerSpaceRadius: 60,
                       sections: showingSections()),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left:58.0),
+              padding: const EdgeInsets.only(left: 58.0),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -105,7 +104,7 @@ class PieChart2State extends State {
     return List.generate(4, (i) {
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 25.0 : 16.0;
-      final radius = isTouched ? 60.0 : 50.0;
+      final radius = isTouched ? 90.0 : 70.0;
       switch (i) {
         case 0:
           return PieChartSectionData(
