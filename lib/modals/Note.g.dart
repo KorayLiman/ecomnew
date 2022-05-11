@@ -18,6 +18,8 @@ class NoteAdapter extends TypeAdapter<Note> {
     };
     return Note(
       NoteTitle: fields[0] as String,
+      color: fields[5] as Color,
+      ID: fields[4] as String,
       NoteContent: fields[1] as String,
       CreatedAt: fields[2] as DateTime,
       IsCompleted: fields[3] as bool,
@@ -27,7 +29,7 @@ class NoteAdapter extends TypeAdapter<Note> {
   @override
   void write(BinaryWriter writer, Note obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.NoteTitle)
       ..writeByte(1)
@@ -35,7 +37,11 @@ class NoteAdapter extends TypeAdapter<Note> {
       ..writeByte(2)
       ..write(obj.CreatedAt)
       ..writeByte(3)
-      ..write(obj.IsCompleted);
+      ..write(obj.IsCompleted)
+      ..writeByte(4)
+      ..write(obj.ID)
+      ..writeByte(5)
+      ..write(obj.color);
   }
 
   @override

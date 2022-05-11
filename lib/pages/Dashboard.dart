@@ -1,4 +1,7 @@
 import 'package:ecomappkoray/blocs/bloc/auth_bloc.dart';
+import 'package:ecomappkoray/data/LocalStorage.dart';
+import 'package:ecomappkoray/locator.dart';
+import 'package:ecomappkoray/modals/Note.dart';
 import 'package:ecomappkoray/modals/Product.dart';
 import 'package:ecomappkoray/repositories/firestorerepo.dart';
 import 'package:ecomappkoray/widgets/BarChart.dart';
@@ -8,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gradient_ui_widgets/gradient_ui_widgets.dart';
+import 'package:uuid/uuid.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({Key? key, required this.firebaseRepository}) : super(key: key);
@@ -24,10 +28,32 @@ class _DashboardState extends State<Dashboard> {
   TextEditingController _ExplanationController = TextEditingController();
   int _MenuIndex = 0;
 
+  late List<Note> Notes;
+
   String? ProductName;
   double? ProductPrice;
   String? ProductExplanation;
+  String? NoteTitle;
+  Color BoxColor = Colors.white;
+
+  String? NoteContent;
+
+  DateTime? CreatedAt;
+
+  bool? IsCompleted;
   String PageName = "Anasayfa";
+  String? NoteID;
+
+  late LocalStorage _localStorage;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Notes = <Note>[];
+    _localStorage = locator<LocalStorage>();
+    _GetAllTasksFromDB();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,23 +87,25 @@ class _DashboardState extends State<Dashboard> {
                 SizedBox(
                   width: 30,
                 ),
-                Center(
-                  child: Container(
-                      width: 200,
-                      height: 32,
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.search),
-                            filled: true,
-                            fillColor: Colors.grey.shade100,
-                            contentPadding: const EdgeInsets.only(
-                                left: 6, right: 0, top: 0, bottom: 0),
-                            hintStyle: TextStyle(),
-                            hintText: "Ara",
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(10))),
-                      )),
+                Expanded(
+                  child: Center(
+                    child: Container(
+                        width: 200,
+                        height: 32,
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.search),
+                              filled: true,
+                              fillColor: Colors.grey.shade100,
+                              contentPadding: const EdgeInsets.only(
+                                  left: 6, right: 0, top: 0, bottom: 0),
+                              hintStyle: TextStyle(),
+                              hintText: "Ara",
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.circular(10))),
+                        )),
+                  ),
                 ),
               ],
             ),
@@ -128,7 +156,322 @@ class _DashboardState extends State<Dashboard> {
                 ]))
             : PageName == "Not Defteri"
                 ? GradientFloatingActionButton.extended(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                return Dialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(40)),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: BoxColor,
+                                      borderRadius: BorderRadius.circular(40),
+                                    ),
+                                    height: 400,
+                                    width: 500,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 10.0),
+                                                child: Container(
+                                                  height: 38,
+                                                  child: Text(
+                                                    "Not Ekle",
+                                                    style: TextStyle(
+                                                        color: Colors
+                                                            .grey.shade600,
+                                                        fontSize: 24),
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Container(
+                                                  height: 35,
+                                                  width: 200,
+                                                  child: TextFormField(
+                                                    onChanged: (value) {
+                                                      NoteTitle = value;
+                                                    },
+                                                    decoration: InputDecoration(
+                                                        contentPadding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                left: 6,
+                                                                right: 0,
+                                                                top: 0,
+                                                                bottom: 0),
+                                                        filled: true,
+                                                        fillColor: Colors
+                                                            .grey.shade200,
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide.none,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(15),
+                                                        ),
+                                                        hintText: "Başlık"),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Expanded(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            BoxColor =
+                                                                Colors.white;
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                          height: 30,
+                                                          width: 30,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  border: Border
+                                                                      .all()),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            BoxColor =
+                                                                Colors.blue;
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                          height: 30,
+                                                          width: 30,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  border: Border
+                                                                      .all(),
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: Colors
+                                                                      .blue),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            BoxColor =
+                                                                Colors.orange;
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                          height: 30,
+                                                          width: 30,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  border: Border
+                                                                      .all(),
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: Colors
+                                                                      .orange),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            BoxColor =
+                                                                Colors.pink;
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                          height: 30,
+                                                          width: 30,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  border: Border
+                                                                      .all(),
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: Colors
+                                                                      .pink),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            BoxColor =
+                                                                Colors.green;
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                          height: 30,
+                                                          width: 30,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  border: Border
+                                                                      .all(),
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: Colors
+                                                                      .green),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Expanded(
+                                                flex: 4,
+                                                child: Container(
+                                                  width: 400,
+                                                  child: TextFormField(onFieldSubmitted: (value) async{
+                                                     if (NoteTitle !=
+                                                                  null &&
+                                                              NoteContent !=
+                                                                  null) {
+                                                            Note NewNote = Note(
+                                                                NoteTitle:
+                                                                    NoteTitle!,
+                                                                color: BoxColor,
+                                                                ID: Uuid().v4(),
+                                                                NoteContent:
+                                                                    NoteContent!,
+                                                                CreatedAt:
+                                                                    DateTime
+                                                                        .now(),
+                                                                IsCompleted:
+                                                                    false);
+                                                            Notes.insert(
+                                                                0, NewNote);
+                                                            await _localStorage
+                                                                .AddNote(
+                                                                    note:
+                                                                        NewNote);
+                                                          }
+                                                  } ,
+                                                    onChanged: (value) {
+                                                      NoteContent = value;
+                                                    },
+                                                    maxLines: 10,
+                                                    decoration: InputDecoration(
+                                                        contentPadding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                left: 6,
+                                                                right: 0,
+                                                                top: 18,
+                                                                bottom: 0),
+                                                        filled: true,
+                                                        fillColor: Colors
+                                                            .grey.shade200,
+                                                        border:
+                                                            OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide.none,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(15),
+                                                        ),
+                                                        hintText: "İçerik"),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: Container(
+                                                    width: 200,
+                                                    child: ElevatedButton(
+                                                        onPressed: () async {
+                                                          if (NoteTitle !=
+                                                                  null &&
+                                                              NoteContent !=
+                                                                  null) {
+                                                            Note NewNote = Note(
+                                                                NoteTitle:
+                                                                    NoteTitle!,
+                                                                color: BoxColor,
+                                                                ID: Uuid().v4(),
+                                                                NoteContent:
+                                                                    NoteContent!,
+                                                                CreatedAt:
+                                                                    DateTime
+                                                                        .now(),
+                                                                IsCompleted:
+                                                                    false);
+                                                            Notes.insert(
+                                                                0, NewNote);
+                                                            await _localStorage
+                                                                .AddNote(
+                                                                    note:
+                                                                        NewNote);
+                                                          }
+                                                        },
+                                                        child: const Text(
+                                                            "Oluştur")),
+                                                  )),
+                                              SizedBox(
+                                                height: 10,
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          });
+                      // Note NewNote = Note(NoteTitle: NoteTitle!, NoteContent: NoteContent!, CreatedAt: CreatedAt!, IsCompleted: IsCompleted!,ID: );
+                      // Notes.insert(0, NewNote);
+                    },
                     label: const Text("Not Ekle"),
                     gradient: const LinearGradient(colors: [
                       Color.fromRGBO(240, 43, 17, 1),
@@ -314,24 +657,16 @@ class _DashboardState extends State<Dashboard> {
                 child: SingleChildScrollView(
                   physics: ScrollPhysics(),
                   child: GridView.builder(
+                      padding: EdgeInsets.all(20),
                       shrinkWrap: true,
                       itemCount: 8,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        mainAxisSpacing: 20,
+                        crossAxisSpacing: 20,
                         crossAxisCount: 4,
                       ),
                       itemBuilder: (context, index) {
-                        return Container(
-                            height: 180,
-                            width: 60,
-                            color: index == 0
-                                ? Colors.blue.shade400
-                                : index == 1
-                                    ? Colors.orange.shade400
-                                    : index == 2
-                                        ? Colors.green.shade400
-                                        : index == 3
-                                            ? Colors.pink.shade400
-                                            : Colors.blue);
+                        
                       }),
                 ),
               )
@@ -921,5 +1256,10 @@ class _DashboardState extends State<Dashboard> {
         ),
       ],
     );
+  }
+
+  void _GetAllTasksFromDB() async {
+    Notes = await _localStorage.GetAllNotes();
+    setState(() {});
   }
 }
