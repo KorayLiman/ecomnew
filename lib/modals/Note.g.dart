@@ -18,7 +18,7 @@ class NoteAdapter extends TypeAdapter<Note> {
     };
     return Note(
       NoteTitle: fields[0] as String,
-      color: fields[5] as Color,
+      ColorValue: fields[5] as int,
       ID: fields[4] as String,
       NoteContent: fields[1] as String,
       CreatedAt: fields[2] as DateTime,
@@ -41,7 +41,7 @@ class NoteAdapter extends TypeAdapter<Note> {
       ..writeByte(4)
       ..write(obj.ID)
       ..writeByte(5)
-      ..write(obj.color);
+      ..write(obj.ColorValue);
   }
 
   @override

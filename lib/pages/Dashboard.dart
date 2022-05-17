@@ -4,7 +4,9 @@ import 'package:ecomappkoray/locator.dart';
 import 'package:ecomappkoray/modals/Note.dart';
 import 'package:ecomappkoray/modals/Product.dart';
 import 'package:ecomappkoray/repositories/firestorerepo.dart';
+import 'package:ecomappkoray/widgets/AddProduct.dart';
 import 'package:ecomappkoray/widgets/BarChart.dart';
+import 'package:ecomappkoray/widgets/NoteItem.dart';
 import 'package:ecomappkoray/widgets/PieChart.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -51,11 +53,12 @@ class _DashboardState extends State<Dashboard> {
     super.initState();
     Notes = <Note>[];
     _localStorage = locator<LocalStorage>();
-    _GetAllTasksFromDB();
   }
 
   @override
   Widget build(BuildContext context) {
+    _GetAllTasksFromDB();
+
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -148,7 +151,9 @@ class _DashboardState extends State<Dashboard> {
         ),
         floatingActionButton: PageName == "Ürün Ekle/Çıkar"
             ? GradientFloatingActionButton.extended(
-                onPressed: () {},
+                onPressed: () async {
+                  await AddProduct().show(context);
+                },
                 label: const Text("Ürün Ekle"),
                 gradient: const LinearGradient(colors: [
                   Color.fromRGBO(240, 43, 17, 1),
@@ -368,31 +373,29 @@ class _DashboardState extends State<Dashboard> {
                                                 flex: 4,
                                                 child: Container(
                                                   width: 400,
-                                                  child: TextFormField(onFieldSubmitted: (value) async{
-                                                     if (NoteTitle !=
-                                                                  null &&
-                                                              NoteContent !=
-                                                                  null) {
-                                                            Note NewNote = Note(
-                                                                NoteTitle:
-                                                                    NoteTitle!,
-                                                                color: BoxColor,
-                                                                ID: Uuid().v4(),
-                                                                NoteContent:
-                                                                    NoteContent!,
-                                                                CreatedAt:
-                                                                    DateTime
-                                                                        .now(),
-                                                                IsCompleted:
-                                                                    false);
-                                                            Notes.insert(
-                                                                0, NewNote);
-                                                            await _localStorage
-                                                                .AddNote(
-                                                                    note:
-                                                                        NewNote);
-                                                          }
-                                                  } ,
+                                                  child: TextFormField(
+                                                    onFieldSubmitted:
+                                                        (value) async {
+                                                      if (NoteTitle != null &&
+                                                          NoteContent != null) {
+                                                        Note NewNote = Note(
+                                                            NoteTitle:
+                                                                NoteTitle!,
+                                                            ColorValue:
+                                                                BoxColor.value,
+                                                            ID: Uuid().v4(),
+                                                            NoteContent:
+                                                                NoteContent!,
+                                                            CreatedAt:
+                                                                DateTime.now(),
+                                                            IsCompleted: false);
+                                                        Notes.insert(
+                                                            0, NewNote);
+                                                        await _localStorage
+                                                            .AddNote(
+                                                                note: NewNote);
+                                                      }
+                                                    },
                                                     onChanged: (value) {
                                                       NoteContent = value;
                                                     },
@@ -429,6 +432,8 @@ class _DashboardState extends State<Dashboard> {
                                                     width: 200,
                                                     child: ElevatedButton(
                                                         onPressed: () async {
+                                                          Navigator.pop(
+                                                              context);
                                                           if (NoteTitle !=
                                                                   null &&
                                                               NoteContent !=
@@ -436,7 +441,9 @@ class _DashboardState extends State<Dashboard> {
                                                             Note NewNote = Note(
                                                                 NoteTitle:
                                                                     NoteTitle!,
-                                                                color: BoxColor,
+                                                                ColorValue:
+                                                                    BoxColor
+                                                                        .value,
                                                                 ID: Uuid().v4(),
                                                                 NoteContent:
                                                                     NoteContent!,
@@ -653,23 +660,44 @@ class _DashboardState extends State<Dashboard> {
                   ],
                 ),
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: ScrollPhysics(),
-                  child: GridView.builder(
-                      padding: EdgeInsets.all(20),
-                      shrinkWrap: true,
-                      itemCount: 8,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        mainAxisSpacing: 20,
-                        crossAxisSpacing: 20,
-                        crossAxisCount: 4,
+              Notes.isNotEmpty
+                  ? Expanded(
+                      child: SingleChildScrollView(
+                        physics: ScrollPhysics(),
+                        child: GridView.builder(
+                            padding: EdgeInsets.all(20),
+                            shrinkWrap: true,
+                            itemCount: Notes.length,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              mainAxisSpacing: 20,
+                              crossAxisSpacing: 20,
+                              crossAxisCount: 4,
+                            ),
+                            itemBuilder: (context, index) {
+                              Note CurrentNote = Notes[index];
+                              return NoteItem(
+                                note: CurrentNote,
+                              );
+                            }),
                       ),
-                      itemBuilder: (context, index) {
-                        
-                      }),
-                ),
-              )
+                    )
+                  : Expanded(
+                      child: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset("assets/images/note_64px.png"),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            "Lütfen not ekleyin",
+                            style: TextStyle(fontSize: 24),
+                          )
+                        ],
+                      )),
+                    ),
             ],
           ),
         ),

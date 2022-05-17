@@ -15,23 +15,23 @@ class Note extends HiveObject {
   @HiveField(4)
   String ID;
   @HiveField(5)
-  Color color;
+  int ColorValue;
   Note(
-      {required this.NoteTitle,required this.color,
+      {required this.NoteTitle,required this.ColorValue,
       required this.ID,
       required this.NoteContent,
       required this.CreatedAt,
       required this.IsCompleted});
   factory Note.create(
       {required String NoteTitle,
-      required Color color,
+      required int ColorValue,
       required String ID,
       required String NoteContent,
       required DateTime CreatedAt,
       required bool IsCompleted}) {
     return Note(
         ID: ID,
-        color: color,
+        ColorValue: ColorValue,
         NoteTitle: NoteTitle,
         NoteContent: NoteContent,
         CreatedAt: CreatedAt,

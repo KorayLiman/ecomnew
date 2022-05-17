@@ -64,16 +64,20 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Ecommerce App',
-            home: kIsWeb
-                ? user != null
-                    ? Dashboard(
-                        firebaseRepository: firebaseRepository,
-                      )
-                    : DashboardLogin(
-                        firebaseRepository: firebaseRepository,
-                      )
-                : HomePage()),
+            home: Dashboard(firebaseRepository: firebaseRepository)),
       ),
     );
   }
 }
+// MaterialApp(
+//             debugShowCheckedModeBanner: false,
+//             title: 'Ecommerce App',
+//             home: kIsWeb
+//                 ? user != null
+//                     ? Dashboard(
+//                         firebaseRepository: firebaseRepository,
+//                       )
+//                     : DashboardLogin(
+//                         firebaseRepository: firebaseRepository,
+//                       )
+//                 : HomePage()),
