@@ -49,6 +49,8 @@ dependencies:
   gradient_ui_widgets: ^1.0.2-nullsafety
   uuid: ^3.0.6
   auto_size_text: ^3.0.0
+  firebase_storage: ^10.2.16
+  image_picker: ^0.8.5+3
 
 dev_dependencies:
   flutter_test:

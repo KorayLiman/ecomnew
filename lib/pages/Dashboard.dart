@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecomappkoray/blocs/bloc/auth_bloc.dart';
 import 'package:ecomappkoray/data/LocalStorage.dart';
 import 'package:ecomappkoray/locator.dart';
@@ -31,6 +32,7 @@ class _DashboardState extends State<Dashboard> {
   int _MenuIndex = 0;
 
   late List<Note> Notes;
+  FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   String? ProductName;
   double? ProductPrice;
@@ -47,17 +49,20 @@ class _DashboardState extends State<Dashboard> {
   String? NoteID;
 
   late LocalStorage _localStorage;
+  late List<Product> ProductList;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     Notes = <Note>[];
     _localStorage = locator<LocalStorage>();
+    ProductList = <Product>[];
   }
 
   @override
   Widget build(BuildContext context) {
     _GetAllTasksFromDB();
+    _GetAllProducts();
 
     return Scaffold(
         appBar: AppBar(
@@ -185,6 +190,68 @@ class _DashboardState extends State<Dashboard> {
                                         Expanded(
                                           child: Column(
                                             children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      Navigator.pop(context);
+                                                      if (NoteTitle != null &&
+                                                          NoteContent != null) {
+                                                        Note NewNote = Note(
+                                                            NoteTitle:
+                                                                NoteTitle!,
+                                                            ColorValue:
+                                                                BoxColor.value,
+                                                            ID: Uuid().v4(),
+                                                            NoteContent:
+                                                                NoteContent!,
+                                                            CreatedAt:
+                                                                DateTime.now(),
+                                                            IsCompleted: false);
+                                                        Notes.insert(
+                                                            0, NewNote);
+                                                        await _localStorage
+                                                            .AddNote(
+                                                                note: NewNote);
+                                                      }
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              12.0),
+                                                      child: CircleAvatar(
+                                                        backgroundColor:
+                                                            Colors.green,
+                                                        child: Icon(
+                                                          Icons.check,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              12.0),
+                                                      child: CircleAvatar(
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        child: Icon(
+                                                          Icons.close,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     top: 10.0),
@@ -426,46 +493,6 @@ class _DashboardState extends State<Dashboard> {
                                               SizedBox(
                                                 height: 10,
                                               ),
-                                              Expanded(
-                                                  flex: 1,
-                                                  child: Container(
-                                                    width: 200,
-                                                    child: ElevatedButton(
-                                                        onPressed: () async {
-                                                          Navigator.pop(
-                                                              context);
-                                                          if (NoteTitle !=
-                                                                  null &&
-                                                              NoteContent !=
-                                                                  null) {
-                                                            Note NewNote = Note(
-                                                                NoteTitle:
-                                                                    NoteTitle!,
-                                                                ColorValue:
-                                                                    BoxColor
-                                                                        .value,
-                                                                ID: Uuid().v4(),
-                                                                NoteContent:
-                                                                    NoteContent!,
-                                                                CreatedAt:
-                                                                    DateTime
-                                                                        .now(),
-                                                                IsCompleted:
-                                                                    false);
-                                                            Notes.insert(
-                                                                0, NewNote);
-                                                            await _localStorage
-                                                                .AddNote(
-                                                                    note:
-                                                                        NewNote);
-                                                          }
-                                                        },
-                                                        child: const Text(
-                                                            "Oluştur")),
-                                                  )),
-                                              SizedBox(
-                                                height: 10,
-                                              )
                                             ],
                                           ),
                                         )
@@ -781,7 +808,7 @@ class _DashboardState extends State<Dashboard> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(left: 17.0),
-                            child: Icon(Icons.mail,
+                            child: Icon(Icons.add_box,
                                 color: _MenuIndex == 1
                                     ? Colors.blue
                                     : Colors.grey.shade700),
@@ -863,6 +890,23 @@ class _DashboardState extends State<Dashboard> {
                   ],
                 ),
               ),
+              ProductList.isEmpty ?
+              Expanded(
+                child: Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset("assets/images/product_64px.png"),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    const Text(
+                      "Lütfen ürün ekleyin",
+                      style: TextStyle(fontSize: 24),
+                    )
+                  ],
+                )),
+              ):Container(height: 100,width: 100,color: Colors.blue,)
             ],
           ),
         ),
@@ -946,7 +990,7 @@ class _DashboardState extends State<Dashboard> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(left: 17.0),
-                            child: Icon(Icons.mail,
+                            child: Icon(Icons.add_box,
                                 color: _MenuIndex == 1
                                     ? Colors.blue
                                     : Colors.grey.shade700),
@@ -1289,5 +1333,14 @@ class _DashboardState extends State<Dashboard> {
   void _GetAllTasksFromDB() async {
     Notes = await _localStorage.GetAllNotes();
     setState(() {});
+  }
+
+  void _GetAllProducts() async {
+    QuerySnapshot snapshot =
+        await _firebaseFirestore.collection("Products").get();
+    for (var product in snapshot.docs) {
+      Product Prod = Product.FromMap(product.data() as Map<String, dynamic>);
+      ProductList.add(Prod);
+    }
   }
 }
