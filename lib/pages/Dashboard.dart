@@ -5,6 +5,8 @@ import 'package:ecomappkoray/locator.dart';
 import 'package:ecomappkoray/modals/Note.dart';
 import 'package:ecomappkoray/modals/Product.dart';
 import 'package:ecomappkoray/repositories/firestorerepo.dart';
+import 'package:ecomappkoray/services/FirebaseNoteService.dart';
+import 'package:ecomappkoray/services/FirebaseStorageService.dart';
 import 'package:ecomappkoray/widgets/AddProduct.dart';
 import 'package:ecomappkoray/widgets/BarChart.dart';
 import 'package:ecomappkoray/widgets/NoteItem.dart';
@@ -47,7 +49,8 @@ class _DashboardState extends State<Dashboard> {
   bool? IsCompleted;
   String PageName = "Anasayfa";
   String? NoteID;
-
+  late FirebaseNoteService _firebaseNoteService;
+  late FirebaseStorageService _firebaseStorageService;
   late LocalStorage _localStorage;
   late List<Product> ProductList;
   @override
@@ -56,6 +59,7 @@ class _DashboardState extends State<Dashboard> {
     super.initState();
     Notes = <Note>[];
     _localStorage = locator<LocalStorage>();
+    _firebaseNoteService = locator<FirebaseNoteService>();
     ProductList = <Product>[];
   }
 
@@ -213,9 +217,8 @@ class _DashboardState extends State<Dashboard> {
                                                             IsCompleted: false);
                                                         Notes.insert(
                                                             0, NewNote);
-                                                        await _localStorage
-                                                            .AddNote(
-                                                                note: NewNote);
+                                                        await _firebaseNoteService
+                                                            .AddNote(NewNote);
                                                       }
                                                     },
                                                     child: Padding(
@@ -458,9 +461,7 @@ class _DashboardState extends State<Dashboard> {
                                                             IsCompleted: false);
                                                         Notes.insert(
                                                             0, NewNote);
-                                                        await _localStorage
-                                                            .AddNote(
-                                                                note: NewNote);
+                                                        await _firebaseNoteService.AddNote(NewNote);
                                                       }
                                                     },
                                                     onChanged: (value) {
@@ -890,23 +891,28 @@ class _DashboardState extends State<Dashboard> {
                   ],
                 ),
               ),
-              ProductList.isEmpty ?
-              Expanded(
-                child: Center(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/images/product_64px.png"),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    const Text(
-                      "Lütfen ürün ekleyin",
-                      style: TextStyle(fontSize: 24),
+              ProductList.isEmpty
+                  ? Expanded(
+                      child: Center(
+                          child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset("assets/images/product_64px.png"),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          const Text(
+                            "Lütfen ürün ekleyin",
+                            style: TextStyle(fontSize: 24),
+                          )
+                        ],
+                      )),
                     )
-                  ],
-                )),
-              ):Container(height: 100,width: 100,color: Colors.blue,)
+                  : Container(
+                      height: 100,
+                      width: 100,
+                      color: Colors.blue,
+                    )
             ],
           ),
         ),

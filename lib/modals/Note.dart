@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 part "Note.g.dart";
@@ -17,7 +18,8 @@ class Note extends HiveObject {
   @HiveField(5)
   int ColorValue;
   Note(
-      {required this.NoteTitle,required this.ColorValue,
+      {required this.NoteTitle,
+      required this.ColorValue,
       required this.ID,
       required this.NoteContent,
       required this.CreatedAt,
@@ -37,4 +39,35 @@ class Note extends HiveObject {
         CreatedAt: CreatedAt,
         IsCompleted: IsCompleted);
   }
+
+  Map<String, dynamic> ToMap() {
+    return {
+      "NoteTitle": NoteTitle,
+      "NoteContent": NoteContent,
+      "IsCompleted": IsCompleted,
+      "CreatedAt": FieldValue.serverTimestamp(),
+      "ColorValue": ColorValue,
+      "ID": ID
+    };
+  }
+
+  Note.FromMap(Map<String, dynamic> map)
+      : NoteTitle = map["NoteTitle"],
+        ColorValue = map["ColorValue"],
+        CreatedAt = map["CreatedAt"],
+        ID = map["ID"],
+        IsCompleted = map["IsCompleted"],
+        NoteContent = map["NoteContent"];
+
+/*
+
+
+  Product.FromMap(Map<String, dynamic> map)
+      : ProductID = map["ProductID"],
+        ProductName = map["ProductName"],
+        ImageURL = map["ImageURL"],
+        Price = map["Price"],
+        Explanation = map["Explanation"],
+        Amount = map["Amount"],
+        Weight = map["Weight"]; */
 }
